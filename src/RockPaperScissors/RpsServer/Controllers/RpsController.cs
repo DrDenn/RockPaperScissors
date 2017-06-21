@@ -147,17 +147,18 @@ namespace RpsServer.Controllers
         {
             if (player.Id == game.Player1)
             {
-                game.player1State = move;
+                game.Player1State = move;
             }
             else
             {
-                game.player2State = move;
+                game.Player2State = move;
             }
 
             this.context.Players.Update(player);
             this.context.SaveChanges();
         }
 
+        // Most of these (thise that just use game and player Id) can probably be moved elsewhere (to the Game Model? As Properties?)
         private IActionResult GetGameStatus(Game game, Guid playerId)
         {
             if (this.IsWaiting(game))
@@ -185,17 +186,17 @@ namespace RpsServer.Controllers
 
         private bool IsWaiting(Game game)
         {
-            return game.player1State == PlayerState.Waiting || game.player2State == PlayerState.Waiting;
+            return game.Player1State == PlayerState.Waiting || game.Player2State == PlayerState.Waiting;
         }
 
         private bool IsDraw(Game game)
         {
-            return game.player1State == game.player2State;
+            return game.Player1State == game.Player2State;
         }
 
         private Guid GetWinner(Game game)
         {
-            int diff = game.player1State - game.player2State;
+            int diff = game.Player1State - game.Player2State;
 
             if (diff == 0)
             {
