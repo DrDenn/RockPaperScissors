@@ -6,21 +6,21 @@
 
 <h1>Login</h1>
 
-<form method="post" asp-antiforgery="true">
+<form class="form-group" method="post" asp-antiforgery="true">
     <div asp-validation-summary="ModelOnly"></div>
-    <div>
+    <div class="form-group">
         <label asp-for="UserName"></label>
-        <input asp-for="UserName" />
+        <input asp-for="UserName" class="form-control" />
         <span asp-validation-for="UserName"></span>
     </div>
-    <div>
+    <div class="form-group">
         <label asp-for="Password"></label>
-        <input asp-for="Password" />
+        <input asp-for="Password" class="form-control" />
         <span asp-validation-for="Password"></span>
     </div>
-    <input type="submit" value="Login" />
+    <input class="btn btn-default" type="submit" value="Login" />
 </form>
 
-<div>
-    @Html.ActionLink("Not a member? Register!", nameof(AccountController.Register))
+<div class="form-group">
+    <a class="btn btn-info" asp-controller="Account" asp-action="Register">Not a member? Register!</a>
 </div>

@@ -6,7 +6,7 @@ namespace RpsWebsite.Entities
     /// Asp.NET Core Identity EntityFramework User
     /// All these lovely libraries handle all the auth-n for us.
     /// </summary>
-    public class User : IdentityUser
+    public sealed class User : IdentityUser
     {
         public User()
         {

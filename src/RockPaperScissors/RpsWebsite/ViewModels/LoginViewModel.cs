@@ -2,7 +2,7 @@
 
 namespace RpsWebsite.ViewModels
 {
-    public class LoginViewModel
+    public sealed class LoginViewModel
     {
         [Required]
         public string UserName { get; set; }

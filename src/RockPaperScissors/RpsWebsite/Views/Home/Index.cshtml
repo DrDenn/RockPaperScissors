@@ -2,20 +2,22 @@
     ViewBag.Title = "Rock/Paper/Scissors";
 }
 <div class="text-center">
-    <div>
-        <p>This is Rock/Paper/Scissors, a SkyBrand production. We are the most awesome and so are you. Welcome!</p>
+    <div class="jumbotron">
+        <p>Let's play Rock Paper Scissors with strangers!</p>
     </div>
 
     @if (User.Identity.IsAuthenticated)
     {
-
+        <div class="btn-group-vertical">
+            <a class="btn btn-default btn-lg" asp-controller="Play" asp-action="Index">Play!</a>
+        </div>
     }
     else
     {
 
         <div class="btn-group-vertical">
-            <a class="btn btn-default" asp-controller="Account" asp-action="Login">Log In</a>
-            <a class="btn btn-default" asp-controller="Account" asp-action="Register">Register</a>
+            <a class="btn btn-default btn-lg" asp-controller="Account" asp-action="Login">Log In</a>
+            <a class="btn btn-default btn-lg" asp-controller="Account" asp-action="Register">Register</a>
         </div>
     }
 </div>

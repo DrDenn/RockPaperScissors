@@ -2,7 +2,7 @@
 
 namespace RpsWebsite.ViewModels
 {
-    public class RegisterViewModel
+    public sealed class RegisterViewModel
     {
         [Required, MinLength(3), MaxLength(64)]
         public string UserName { get; set; }

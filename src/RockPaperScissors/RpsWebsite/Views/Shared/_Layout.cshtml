@@ -17,6 +17,7 @@
                 @if (User.Identity.IsAuthenticated)
                 {
                     <span>Hello, @User.Identity.Name!</span>
+
                     <form method="post" asp-controller="Account" asp-action="Logout" asp-antiforgery="true">
                         <input type="submit" value="Logout" />
                     </form>
@@ -26,6 +27,9 @@
     </nav>
     <div class="container">
         @RenderBody()
+        <footer class="navbar navbar-fixed-bottom text-center">
+            <p>SkyBrand productions - Copyright 2017</p>
+        </footer>
     </div>
 </body>
 </html>
