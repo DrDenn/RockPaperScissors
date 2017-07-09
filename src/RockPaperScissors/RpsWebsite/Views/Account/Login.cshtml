@@ -1,0 +1,26 @@
+﻿@model LoginViewModel
+
+@{ 
+    ViewBag.Title = "Login";
+}
+
+<h1>Login</h1>
+
+<form method="post" asp-antiforgery="true">
+    <div asp-validation-summary="ModelOnly"></div>
+    <div>
+        <label asp-for="UserName"></label>
+        <input asp-for="UserName" />
+        <span asp-validation-for="UserName"></span>
+    </div>
+    <div>
+        <label asp-for="Password"></label>
+        <input asp-for="Password" />
+        <span asp-validation-for="Password"></span>
+    </div>
+    <input type="submit" value="Login" />
+</form>
+
+<div>
+    @Html.ActionLink("Not a member? Register!", nameof(AccountController.Register))
+</div>
