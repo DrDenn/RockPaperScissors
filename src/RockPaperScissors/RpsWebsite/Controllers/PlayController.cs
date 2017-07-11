@@ -24,8 +24,10 @@ namespace RpsWebsite.Controllers
         }
 
         [HttpGet]
-        public IActionResult InGame(GameViewModel gameId)
+        public IActionResult InGame(GameViewModel game)
         {
+            ViewBag.GameId = game.GameId;
+
             return View();
         }
     }

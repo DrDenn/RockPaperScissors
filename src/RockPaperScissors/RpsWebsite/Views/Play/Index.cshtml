@@ -3,3 +3,13 @@
 }
 
 <h1>Finding a game at @ViewBag.Endpoint</h1>
+
+<div class="jumbotron" id="response">
+</div>
+
+<script>
+    $.get("@ViewBag.Endpoint/api/rps", function (data, status) {
+        document.getElementById("response").innerHTML = "<p>" + data + "</p>";
+        window.location.href = "/Play/InGame?gameId=" + data;
+    });
+</script>

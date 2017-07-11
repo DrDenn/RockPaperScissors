@@ -21,6 +21,8 @@ namespace RpsServer.Controllers
         [HttpGet]
         public IActionResult CreateUser()
         {
+            AddHeaders();
+
             User newUser = new User();
             this.context.Users.Add(newUser);
             this.context.SaveChanges();
@@ -30,6 +32,8 @@ namespace RpsServer.Controllers
         [HttpGet("{playerId}")]
         public IActionResult GetOrCreateGame(Guid playerId)
         {
+            AddHeaders();
+
             // Assumption: Existing game with this player doesn't exist
             Game game = this.AddOrUpdateGame(playerId);
             Player player = this.AddOrUpdatePlayer(playerId, game.Id);
@@ -40,6 +44,8 @@ namespace RpsServer.Controllers
         [HttpGet("status/{playerId}")]
         public IActionResult CheckStatus(Guid playerId)
         {
+            AddHeaders();
+
             Player player = this.context.Players.Find(playerId);
             Game game = this.context.Games.Find(player.Game);
             return this.GetGameStatus(game, playerId);
@@ -48,6 +54,8 @@ namespace RpsServer.Controllers
         [HttpPost("{playerId}/{move}")]
         public IActionResult MakeMove(Guid playerId, PlayerState move)
         {
+            AddHeaders();
+
             if (move == PlayerState.Waiting)
             {
                 return new BadRequestResult();
@@ -206,5 +214,14 @@ namespace RpsServer.Controllers
             return (diff == 1 || diff == -2) ? game.Player1 : game.Player2;
         }
         #endregion PlayGame
+
+        #region Skyler Added This
+        private void AddHeaders()
+        {
+            // This allows cross-site requests with AJAX.
+            // TODO: When we have a domain name use it instead of the wildcard.
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+        }
+        #endregion
     }
 }
