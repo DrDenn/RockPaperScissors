@@ -7,9 +7,9 @@
 <div class="jumbotron" id="response">
 </div>
 
+<script type="text/javascript" src="~/lib/scripts/JoinGame.js"></script>
 <script>
-    $.get("@ViewBag.Endpoint/api/rps", function (data, status) {
-        document.getElementById("response").innerHTML = "<p>" + data + "</p>";
-        window.location.href = "/Play/InGame?gameId=" + data;
+    $(document).ready(function () {
+        joinGame("@ViewBag.Endpoint");
     });
 </script>
