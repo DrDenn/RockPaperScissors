@@ -2,4 +2,35 @@
     ViewBag.Title = "Playing Rock Paper Scissors";
 }
 
-<h1>Finding a game at @ViewBag.Endpoint</h1>
+<div class="container">
+
+    <div class="row text-center" id="record">
+        <!-- There is some hidden voodoo with this jumbotron. Updated in Javascript. -->
+        <h1 class="col-md-12" id="recordcontent"></h1>
+    </div>
+
+    <div class="jumbotron text-center" id="status">
+        <!-- There is some hidden voodoo with this jumbotron. Updated in Javascript. -->
+        <h2>Searching for a game...</h2>
+    </div>
+
+    <div class="jumbotron text-center" id="controls">
+        <!-- There is some hidden voodoo with these buttons. Callbacks added by Javascript and updated in Javascript. (sorry) -->
+        <input class="btn btn-primary btn-lg" id="rockButton" type="button" value="Rock" />
+        <input class="btn btn-primary btn-lg" id="paperButton" type="button" value="Paper" />
+        <input class="btn btn-primary btn-lg" id="scissorsButton" type="button" value="Scissors" />
+    </div>
+
+    <div class="row">
+        <p class="navbar text-center" id="debug"></p>
+    </div>
+</div>
+
+<!-- Call Startup Functions -->
+<script type="text/javascript" src="~/lib/scripts/Game.js"></script>
+<script>
+    $(document).ready(function () {
+        Init("@ViewBag.Endpoint", "@ViewBag.PlayerId", @ViewBag.PlayerWins, @ViewBag.PlayerLosses, @ViewBag.PlayerDraws);
+    });
+</script>
+

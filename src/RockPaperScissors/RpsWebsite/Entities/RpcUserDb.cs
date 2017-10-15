@@ -11,6 +11,9 @@ namespace RpsWebsite.Entities
     {
         public RpcUserDb(DbContextOptions options) : base(options)
         {
+            // I was missing this line initially.
+            // Note to self: don't miss this line.
+            Database.EnsureCreated();
         }
     }
 }

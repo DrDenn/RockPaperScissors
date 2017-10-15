@@ -25,6 +25,7 @@ namespace RpsWebsite
             var builder = new ConfigurationBuilder()
                             .SetBasePath(env.ContentRootPath)
                             .AddJsonFile("appsettings.json")
+                            .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true)
                             .AddEnvironmentVariables();
 
             _config = builder.Build();
@@ -38,8 +39,8 @@ namespace RpsWebsite
             // Enable ASP.NET MVC
             services.AddMvc();
 
-            // Enable ASP.NET EntityFramework Identity Service (for logging in & auth-n)
-            services.AddDbContext<RpcUserDb>(options => options.UseInMemoryDatabase());
+            // Enable ASP.NET EntityFramework Identity Service (for accounts & auth-n)
+            services.AddDbContext<RpcUserDb>(options => options.UseSqlServer(_config.GetConnectionString("DefaultConnection")));
             services.AddIdentity<User, IdentityRole>(options =>
                 {
                     // - low security passwords -

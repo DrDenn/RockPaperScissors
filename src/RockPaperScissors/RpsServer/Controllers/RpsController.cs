@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using RpsServer.Models;
+using Microsoft.AspNetCore.Http;
+using RpsContract;
 
 namespace RpsServer.Controllers
 {
@@ -21,15 +23,22 @@ namespace RpsServer.Controllers
         [HttpGet]
         public IActionResult CreateUser()
         {
-            User newUser = new User();
-            this.context.Users.Add(newUser);
-            this.context.SaveChanges();
-            return new ObjectResult(newUser.Id);
+            AddHeaders();
+
+            return new StatusCodeResult(StatusCodes.Status501NotImplemented);
+
+            // SKYLER: This doesn't seem used.
+            //User newUser = new User();
+            //this.context.Users.Add(newUser);
+            //this.context.SaveChanges();
+            //return new ObjectResult(newUser.Id);
         }
 
         [HttpGet("{playerId}")]
         public IActionResult GetOrCreateGame(Guid playerId)
         {
+            AddHeaders();
+
             // Assumption: Existing game with this player doesn't exist
             Game game = this.AddOrUpdateGame(playerId);
             Player player = this.AddOrUpdatePlayer(playerId, game.Id);
@@ -40,6 +49,8 @@ namespace RpsServer.Controllers
         [HttpGet("status/{playerId}")]
         public IActionResult CheckStatus(Guid playerId)
         {
+            AddHeaders();
+
             Player player = this.context.Players.Find(playerId);
             Game game = this.context.Games.Find(player.Game);
             return this.GetGameStatus(game, playerId);
@@ -48,6 +59,8 @@ namespace RpsServer.Controllers
         [HttpPost("{playerId}/{move}")]
         public IActionResult MakeMove(Guid playerId, PlayerState move)
         {
+            AddHeaders();
+
             if (move == PlayerState.Waiting)
             {
                 return new BadRequestResult();
@@ -154,6 +167,7 @@ namespace RpsServer.Controllers
                 game.Player2State = move;
             }
 
+            this.context.Games.Update(game);
             this.context.Players.Update(player);
             this.context.SaveChanges();
         }
@@ -161,32 +175,51 @@ namespace RpsServer.Controllers
         // Most of these (thise that just use game and player Id) can probably be moved elsewhere (to the Game Model? As Properties?)
         private IActionResult GetGameStatus(Game game, Guid playerId)
         {
-            if (this.IsWaiting(game))
+            if (this.IsWaiting(game, playerId, out string waitingType))
             {
-                return new ObjectResult("Waiting...");
+                return new ObjectResult(waitingType);
             }
 
             if(this.IsDraw(game))
             {
-                return new ObjectResult("Draw...");
+                return new ObjectResult(GameStatus.Draw);
             }
 
             if(this.IsWinner(game, playerId))
             {
-                return new ObjectResult("Winner!!!");
+                return new ObjectResult(GameStatus.Winner);
             }
 
-            return new ObjectResult("Loser...");
+            return new ObjectResult(GameStatus.Loser);
+        }
+
+        private bool IsWaiting(Game game, Guid playerId, out string waitingType)
+        {
+            if (game.Player1State == PlayerState.Waiting || game.Player2State == PlayerState.Waiting)
+            {
+                bool isPlayer1 = game.Player1 == playerId;
+
+                if (game.Player2 == Guid.Empty)
+                    waitingType = GameStatus.WaitingForPlayer;
+                else if (game.Player1State == PlayerState.Waiting && game.Player2State == PlayerState.Waiting)
+                    waitingType = GameStatus.WaitingForMoves;
+                else if (game.Player1State != PlayerState.Waiting)
+                    waitingType = isPlayer1 ? GameStatus.WaitingForMovesOpponent : GameStatus.WaitingForMovesPlayer;
+                else if (game.Player2State != PlayerState.Waiting)
+                    waitingType = isPlayer1 ? GameStatus.WaitingForMovesPlayer : GameStatus.WaitingForMovesOpponent;
+                else
+                    waitingType = GameStatus.Unknown;
+
+                return true;
+            }
+
+            waitingType = string.Empty;
+            return false;
         }
 
         private bool IsWinner(Game game, Guid playerId)
         {
             return this.GetWinner(game) == playerId;
-        }
-
-        private bool IsWaiting(Game game)
-        {
-            return game.Player1State == PlayerState.Waiting || game.Player2State == PlayerState.Waiting;
         }
 
         private bool IsDraw(Game game)
@@ -206,5 +239,14 @@ namespace RpsServer.Controllers
             return (diff == 1 || diff == -2) ? game.Player1 : game.Player2;
         }
         #endregion PlayGame
+
+        #region Skyler Added This
+        private void AddHeaders()
+        {
+            // This allows cross-site requests with AJAX.
+            // TODO: When we have a domain name use it instead of the wildcard.
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+        }
+        #endregion
     }
 }
