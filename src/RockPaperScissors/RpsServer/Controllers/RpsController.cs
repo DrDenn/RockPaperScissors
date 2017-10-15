@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using RpsServer.Models;
+using Microsoft.AspNetCore.Http;
+using RpsContract;
 
 namespace RpsServer.Controllers
 {
@@ -23,10 +25,13 @@ namespace RpsServer.Controllers
         {
             AddHeaders();
 
-            User newUser = new User();
-            this.context.Users.Add(newUser);
-            this.context.SaveChanges();
-            return new ObjectResult(newUser.Id);
+            return new StatusCodeResult(StatusCodes.Status501NotImplemented);
+
+            // SKYLER: This doesn't seem used.
+            //User newUser = new User();
+            //this.context.Users.Add(newUser);
+            //this.context.SaveChanges();
+            //return new ObjectResult(newUser.Id);
         }
 
         [HttpGet("{playerId}")]
@@ -162,6 +167,7 @@ namespace RpsServer.Controllers
                 game.Player2State = move;
             }
 
+            this.context.Games.Update(game);
             this.context.Players.Update(player);
             this.context.SaveChanges();
         }
@@ -169,32 +175,51 @@ namespace RpsServer.Controllers
         // Most of these (thise that just use game and player Id) can probably be moved elsewhere (to the Game Model? As Properties?)
         private IActionResult GetGameStatus(Game game, Guid playerId)
         {
-            if (this.IsWaiting(game))
+            if (this.IsWaiting(game, playerId, out string waitingType))
             {
-                return new ObjectResult("Waiting...");
+                return new ObjectResult(waitingType);
             }
 
             if(this.IsDraw(game))
             {
-                return new ObjectResult("Draw...");
+                return new ObjectResult(GameStatus.Draw);
             }
 
             if(this.IsWinner(game, playerId))
             {
-                return new ObjectResult("Winner!!!");
+                return new ObjectResult(GameStatus.Winner);
             }
 
-            return new ObjectResult("Loser...");
+            return new ObjectResult(GameStatus.Loser);
+        }
+
+        private bool IsWaiting(Game game, Guid playerId, out string waitingType)
+        {
+            if (game.Player1State == PlayerState.Waiting || game.Player2State == PlayerState.Waiting)
+            {
+                bool isPlayer1 = game.Player1 == playerId;
+
+                if (game.Player2 == Guid.Empty)
+                    waitingType = GameStatus.WaitingForPlayer;
+                else if (game.Player1State == PlayerState.Waiting && game.Player2State == PlayerState.Waiting)
+                    waitingType = GameStatus.WaitingForMoves;
+                else if (game.Player1State != PlayerState.Waiting)
+                    waitingType = isPlayer1 ? GameStatus.WaitingForMovesOpponent : GameStatus.WaitingForMovesPlayer;
+                else if (game.Player2State != PlayerState.Waiting)
+                    waitingType = isPlayer1 ? GameStatus.WaitingForMovesPlayer : GameStatus.WaitingForMovesOpponent;
+                else
+                    waitingType = GameStatus.Unknown;
+
+                return true;
+            }
+
+            waitingType = string.Empty;
+            return false;
         }
 
         private bool IsWinner(Game game, Guid playerId)
         {
             return this.GetWinner(game) == playerId;
-        }
-
-        private bool IsWaiting(Game game)
-        {
-            return game.Player1State == PlayerState.Waiting || game.Player2State == PlayerState.Waiting;
         }
 
         private bool IsDraw(Game game)
